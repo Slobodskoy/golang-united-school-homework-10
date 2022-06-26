@@ -20,6 +20,35 @@ main function reads host/port from env just for an example, flavor it following 
 // Start /** Starts the web server listener on given host and port.
 func Start(host string, port int) {
 	router := mux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	router.HandleFunc("/name/{PARAM}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		param := vars["PARAM"]
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "Hello, %v!", param)
+	}).Methods("GET")
+
+	router.HandleFunc("/bad", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}).Methods("GET")
+
+	router.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		param := r.FormValue("PARAM")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "I got message:\n%s", param)
+	}).Methods("POST")
+
+	router.HandleFunc("/headers", func(w http.ResponseWriter, r *http.Request) {
+		s_a, s_b := r.Header.Get("a"), r.Header.Get("b")
+		a, _:= strconv.Atoi(s_a)
+		b, _ := strconv.Atoi(s_b)
+		sum := a + b
+		w.Header().Set("a+b", strconv.Itoa(sum))
+	}).Methods("POST")
 
 	log.Println(fmt.Printf("Starting API server on %s:%d\n", host, port))
 	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), router); err != nil {
