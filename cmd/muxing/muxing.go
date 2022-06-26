@@ -47,7 +47,7 @@ func Start(host string, port int) {
 		a, _:= strconv.Atoi(s_a)
 		b, _ := strconv.Atoi(s_b)
 		sum := a + b
-		w.Header().Set("a+b", strconv.Itoa(sum))
+		w.Header()["a+b"] = []string {strconv.Itoa(sum)}
 	}).Methods("POST")
 
 	log.Println(fmt.Printf("Starting API server on %s:%d\n", host, port))
