@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -35,10 +37,15 @@ func Start(host string, port int) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}).Methods("GET")
 
-	router.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		param := r.FormValue("PARAM")
+	router.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {		
+		param := &strings.Builder{}
+		_, err := io.Copy(param, r.Body)
+		if err!=nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		fmt.Fprintf(w, "I got message:\n%s", param)
+		w.WriteHeader(http.StatusOK)
 	}).Methods("POST")
 
 	router.HandleFunc("/headers", func(w http.ResponseWriter, r *http.Request) {
