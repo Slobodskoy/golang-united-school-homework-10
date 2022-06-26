@@ -38,7 +38,6 @@ func Start(host string, port int) {
 	router.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		param := r.FormValue("PARAM")
-		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "I got message:\n%s", param)
 	}).Methods("POST")
 
@@ -48,6 +47,7 @@ func Start(host string, port int) {
 		b, _ := strconv.Atoi(s_b)
 		sum := a + b
 		w.Header()["a+b"] = []string {strconv.Itoa(sum)}
+		w.WriteHeader(http.StatusOK)
 	}).Methods("POST")
 
 	log.Println(fmt.Printf("Starting API server on %s:%d\n", host, port))
